@@ -1,0 +1,7 @@
+cdac.examination.ccat.domain
+cdac.examination.ccat.domain.exam
+cdac.examination.ccat.domain.qpMatrix
+cdac.examination.ccat.domain.question
+cdac.examination.ccat.domain.user
+cdac.examination.ccat.service
+cdac.examination.ccat.service.exceptions

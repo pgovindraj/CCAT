@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="
+           http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+           
+
+	<!-- Drives transactions using local JPA APIs -->
+	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory" ref="myEmf" />
+	</bean>
+
+	<bean id="myEmf"
+	 class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+	   <property name="dataSource" ref="dataSource" />
+	   <property name="packagesToScan" value="cdac.examination.ccat.domain" />
+	   <property name="jpaVendorAdapter" ref="hibernateJpaVendorAdapter" />
+	   <property name="jpaProperties">
+				<value>
+					# Tooling
+					hibernate.dialect=org.hibernate.dialect.MySQLDialect
+					hibernate.hbm2ddl.auto=create
+					hibernate.bytecode.provider=cglib
+					
+					# Debugging / logging
+					hibernate.show_sql=true
+					hibernate.format_sql=true
+					hibernate.use_sql_comments=true
+					hibernate.generate_statistics=true
+	
+					# Auto-detect annotated JPA entities
+					hibernate.archive.autodetection=class
+				
+					# Caching
+					#hibernate.cache.use_second_level_cache=true
+					#hibernate.cache.provider_class=net.sf.ehcache.hibernate.EhCacheProvider
+					#hibernate.cache.region.factory_class=net.sf.ehcache.hibernate.SingletonEhCacheRegionFactory
+					#hibernate.cache.use_query_cache=true
+					#net.sf.ehcache.configurationResourceName=ehcache-hibernate.xml
+				</value>
+			</property>
+	</bean>
+
+
+	<bean id="dataSourceTarget" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<!-- Connection Info -->
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="url" value="jdbc:mysql://localhost:3306/springmvc" />
+		<property name="username" value="root" />
+		<property name="password" value="admin" />
+		
+		<!-- Connection Pooling DBCP -->
+		<property name="initialSize" value="5"/>
+		<property name="maxActive" value="100" />
+		<property name="maxIdle" value="30" />
+		<property name="maxWait" value="1000" />
+		<property name="poolPreparedStatements" value="true" />
+		<property name="defaultAutoCommit" value="false" />
+	</bean>
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.LazyConnectionDataSourceProxy">
+		<property name="targetDataSource"><ref local="dataSourceTarget"/></property>
+	</bean>
+	
+	<bean id="hibernateJpaVendorAdapter" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+		<property name="showSql" value="true" />
+		<property name="generateDdl" value="false" />
+	</bean>
+	
+	
+<bean id="txManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+   <property name="entityManagerFactory" ref="myEmf" />
+</bean>
+<tx:annotation-driven transaction-manager="txManager" />
+
+</beans>
